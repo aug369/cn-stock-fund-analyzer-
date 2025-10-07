@@ -1,8 +1,7 @@
-# main.py
 import streamlit as st
 from data_fetch import fetch_stock_data, fetch_fund_data
 from indicators import compute_returns, compute_ma, compute_rsi, compute_macd, compute_bollinger, simple_ma_strategy
-from visualize import visualize_candlestick, visualize_returns
+from visualize import visualize_candlestick, visualize_returns, visualize_ma, visualize_rsi, visualize_macd, visualize_bollinger
 from io import BytesIO
 
 st.set_page_config(page_title="国内股票/基金分析平台", layout="wide")
@@ -19,7 +18,6 @@ if st.button("获取数据"):
     try:
         # 数据抓取
         if asset_type == "股票":
-            # 股票直接输入纯数字，data_fetch.py 内部会自动加 sh/sz
             df = fetch_stock_data(symbol, start_date.strftime("%Y%m%d"), end_date.strftime("%Y%m%d"))
         else:
             df = fetch_fund_data(symbol, start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
@@ -38,6 +36,18 @@ if st.button("获取数据"):
 
         st.subheader("累计收益率")
         st.plotly_chart(visualize_returns(df))
+
+        st.subheader("均线图 (MA)")
+        st.plotly_chart(visualize_ma(df))
+
+        st.subheader("RSI 指标")
+        st.plotly_chart(visualize_rsi(df))
+
+        st.subheader("MACD 指标")
+        st.plotly_chart(visualize_macd(df))
+
+        st.subheader("布林带 (Bollinger Bands)")
+        st.plotly_chart(visualize_bollinger(df))
 
         st.subheader("数据表（最近20条）")
         st.dataframe(df.tail(20))
